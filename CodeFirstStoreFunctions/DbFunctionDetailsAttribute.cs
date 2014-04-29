@@ -10,19 +10,13 @@ namespace CodeFirstStoreFunctions
         /// <summary>
         /// Gets or sets the name of the database schema of the store function.
         /// </summary>
-        public string DatabaseSchema
-        {
-            get;
-            set;
-        }
+        public string DatabaseSchema { get; set; }
 
         /// <summary>
         /// Gets or sets the name of the name of the the column returned by a function mapped to a collection of scalar results.
         /// </summary>
-        public string ResultColumnName
-        {
-            get;
-            set;
-        }
+        public string ResultColumnName { get; set; }
+
+        public Type[] ResultTypes { get; set; }
     }
 }

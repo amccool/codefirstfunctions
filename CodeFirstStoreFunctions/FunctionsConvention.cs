@@ -33,7 +33,6 @@ namespace CodeFirstStoreFunctions
                 model.ConceptualModel.Container.AddFunctionImport(functionImportDefinition);
                 model.StoreModel.AddItem(storeFunctionDefinition);
 
-
                 if (functionImportDefinition.IsComposableAttribute)
                 {
                     model.ConceptualToStoreMapping.AddFunctionImportMapping(
@@ -57,19 +56,11 @@ namespace CodeFirstStoreFunctions
             // TODO: scalar functions?, model defined functions?, multiple result sets?
         }
 
-        private EdmFunction CreateFunctionImport(DbModel model, FunctionImport functionImport)
+        private static EdmFunction CreateFunctionImport(DbModel model, FunctionImport functionImport)
         {
-            List<EntitySet> entitySets = null;
-            if (functionImport.ReturnType.BuiltInTypeKind == BuiltInTypeKind.EntityType)
-            {
-                // TODO: derived types?
-                entitySets =
-                    model.ConceptualModel.Container.EntitySets.Where(s => s.ElementType == functionImport.ReturnType)
-                        .ToList();
-
-                // TODO: throw if no entity set found
-                Debug.Assert(entitySets.Count == 1, "Invalid model (MEST)");
-            }
+            EntitySet[] entitySets;
+            FunctionParameter[] returnParameters;
+            CreateReturnParameters(model, functionImport, out returnParameters, out entitySets);
 
             var functionPayload =
                 new EdmFunctionPayload
@@ -79,13 +70,7 @@ namespace CodeFirstStoreFunctions
                             .Parameters
                             .Select(p => FunctionParameter.Create(p.Key, p.Value, ParameterMode.In))
                             .ToList(),
-                    ReturnParameters = new[]
-                    {
-                        FunctionParameter.Create(
-                            "ReturnParam",
-                            functionImport.ReturnType.GetCollectionType(),
-                            ParameterMode.ReturnValue)
-                    },
+                    ReturnParameters = returnParameters,
                     IsComposable = functionImport.IsComposable,
                     IsFunctionImport = true,
                     EntitySets = entitySets
@@ -97,6 +82,30 @@ namespace CodeFirstStoreFunctions
                 DataSpace.CSpace,
                 functionPayload,
                 null);
+        }
+
+        private static void CreateReturnParameters(DbModel model, FunctionImport functionImport, 
+            out FunctionParameter[] returnParameters, out EntitySet[] entitySets)
+        {
+            var resultCount = functionImport.ReturnTypes.Count();
+            entitySets = new EntitySet[resultCount];
+            returnParameters = new FunctionParameter[resultCount];
+
+            for (var i = 0; i < resultCount; i++)
+            {
+                var returnType = functionImport.ReturnTypes[i];
+
+                if (returnType.BuiltInTypeKind == BuiltInTypeKind.EntityType)
+                {
+                    // TODO: derived types?
+                    entitySets[i] = model.ConceptualModel.Container.EntitySets.Single(s => s.ElementType == returnType);
+                }
+
+                returnParameters[i] = FunctionParameter.Create(
+                    "ReturnParam" + i,
+                    returnType.GetCollectionType(),
+                    ParameterMode.ReturnValue);
+            }            
         }
     }
 }

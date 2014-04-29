@@ -51,14 +51,16 @@ namespace CodeFirstStoreFunctions
             {
                 var functionDetailsAttr = 
                     Attribute.GetCustomAttribute(method, typeof(DbFunctionDetailsAttribute)) as DbFunctionDetailsAttribute;
+
+                var isComposable = returnGenericTypeDefinition == typeof (IQueryable<>);
                 
                 return new FunctionImport(
                     method.Name, 
                     GetParameters(method),
-                    GetReturnEdmItemType(method.ReturnType.GetGenericArguments()[0]),
+                    GetReturnTypes(method.ReturnType.GetGenericArguments()[0], functionDetailsAttr, isComposable),
                     functionDetailsAttr != null ? functionDetailsAttr.ResultColumnName : null,
                     functionDetailsAttr != null ? functionDetailsAttr.DatabaseSchema : null,
-                    isComposable: returnGenericTypeDefinition == typeof(IQueryable<>));
+                    isComposable);
             }
 
             return null;
@@ -86,6 +88,21 @@ namespace CodeFirstStoreFunctions
                 }
 
                 yield return new KeyValuePair<string, EdmType>(parameter.Name, parameterEdmType);
+            }
+        }
+
+        private IEnumerable<EdmType> GetReturnTypes(Type methodReturnType, DbFunctionDetailsAttribute functionDetailsAttribute, bool isComposable)
+        {
+            if (isComposable || functionDetailsAttribute == null || functionDetailsAttribute.ResultTypes == null || functionDetailsAttribute.ResultTypes.Length < 2)
+            {
+                yield return GetReturnEdmItemType(methodReturnType);
+            }
+            else
+            {
+                foreach (var resultType in functionDetailsAttribute.ResultTypes)
+                {
+                    yield return GetReturnEdmItemType(resultType);
+                }   
             }
         }
 

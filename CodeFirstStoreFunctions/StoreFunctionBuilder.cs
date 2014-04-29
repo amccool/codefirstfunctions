@@ -42,14 +42,17 @@ namespace CodeFirstStoreFunctions
             var returnParameters = new List<FunctionParameter>();
             if (functionImport.IsComposable)
             {
-                var returnEdmType =
-                    CreateReturnRowType(functionImport.ResultColumnName, functionImport.ReturnType);
+                foreach (var returnType in functionImport.ReturnTypes)
+                {
+                    var returnEdmType =
+                        CreateReturnRowType(functionImport.ResultColumnName, returnType);
 
-                returnParameters.Add(
-                    FunctionParameter.Create(
-                        "ReturnParam",
-                        returnEdmType.GetCollectionType(),
-                        ParameterMode.ReturnValue));
+                    returnParameters.Add(
+                        FunctionParameter.Create(
+                            "ReturnParam",
+                            returnEdmType.GetCollectionType(),
+                            ParameterMode.ReturnValue));
+                }
             }
 
             var functionPayload =

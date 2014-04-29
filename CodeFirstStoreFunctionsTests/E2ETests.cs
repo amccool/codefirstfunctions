@@ -127,6 +127,12 @@ namespace CodeFirstStoreFunctions
 
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<AirportType>("GetAirportTypeSP", airportTypeParameter);
         }
+
+        [DbFunctionDetails(ResultTypes = new[] {typeof (Airport_ResultType), typeof (Airport)})]
+        public virtual ObjectResult<Airport_ResultType> MultipleResultSets()
+        {
+            return ((IObjectContextAdapter) this).ObjectContext.ExecuteFunction<Airport_ResultType>("MultipleResultSets");
+        }
     }
 
     #region initializer
@@ -255,6 +261,22 @@ namespace CodeFirstStoreFunctions
                 "SELECT [Type] " +
                 "FROM [dbo].[Airports] " +
                 "WHERE [Type] = @AirportType");
+
+            context.Database.ExecuteSqlCommand(
+                "CREATE PROCEDURE [dbo].[MultipleResultSets] AS " +
+                "SELECT [IATACode], " +
+                "   [CityCode], " +
+                "   [CountryCode], " +
+                "   [Name], " +
+                "   [TerminalCount] " +
+                "FROM [dbo].[Airports] " +
+                "SELECT [IATACode], " +
+                "   [CityCode], " +
+                "   [CountryCode], " +
+                "   [Name], " +
+                "   [TerminalCount], " +
+                "   [Type] " +
+                "FROM [dbo].[Airports]");
         }
     }
     
@@ -409,6 +431,19 @@ namespace CodeFirstStoreFunctions
 
                 Assert.Equal(4, result.Count());
                 Assert.True(result.All(r => r == AirportType.International));
+            }
+        }
+
+        [Fact]
+        public void Can_invoke_stored_proc_with_multiple_resultsets()
+        {
+            using (var ctx = new MyContext())
+            {
+                var results = ctx.MultipleResultSets();
+                Assert.Equal(4, results.ToList().Count);
+
+                var secondResultSet = results.GetNextResult<Airport>();
+                Assert.Equal(4, secondResultSet.ToList().Count);
             }
         }
     }

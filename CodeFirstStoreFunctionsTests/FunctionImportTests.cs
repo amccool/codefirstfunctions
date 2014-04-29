@@ -8,26 +8,26 @@ namespace CodeFirstStoreFunctions
 
     public class FunctionImportTests
     {
-        [Fact]
-        public void FunctionImportInitialized()
-        {
-            var edmType = PrimitiveType.GetEdmPrimitiveType(PrimitiveTypeKind.Boolean);
-            var parameters =
-                new[] 
-                { 
-                    new KeyValuePair<string, EdmType>("p1", edmType),
-                    new KeyValuePair<string, EdmType>("p2", edmType),
-                };
+        //[Fact]
+        //public void FunctionImportInitialized()
+        //{
+        //    var edmType = PrimitiveType.GetEdmPrimitiveType(PrimitiveTypeKind.Boolean);
+        //    var parameters =
+        //        new[] 
+        //        { 
+        //            new KeyValuePair<string, EdmType>("p1", edmType),
+        //            new KeyValuePair<string, EdmType>("p2", edmType),
+        //        };
 
-            var functionImport = 
-                new FunctionImport("Func", parameters, edmType, "result", "dbo", isComposable: true);
+        //    var functionImport = 
+        //        new FunctionImport("Func", parameters, edmType, "result", "dbo", isComposable: true);
 
-            Assert.Equal("Func", functionImport.Name);
-            Assert.Same(edmType, functionImport.ReturnType);
-            Assert.Equal(parameters, functionImport.Parameters);
-            Assert.Equal("result", functionImport.ResultColumnName);
-            Assert.Equal("dbo", functionImport.DatabaseSchema);
-            Assert.True(functionImport.IsComposable);
-        }
+        //    Assert.Equal("Func", functionImport.Name);
+        //    Assert.Same(edmType, functionImport.ReturnType);
+        //    Assert.Equal(parameters, functionImport.Parameters);
+        //    Assert.Equal("result", functionImport.ResultColumnName);
+        //    Assert.Equal("dbo", functionImport.DatabaseSchema);
+        //    Assert.True(functionImport.IsComposable);
+        //}
     }
 }

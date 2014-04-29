@@ -85,107 +85,107 @@ namespace CodeFirstStoreFunctions
                 // nullable enum and primitive types
             }
 
-            [Fact]
-            public void FindFunctionImports_creates_function_imports_returning_primitive_types()
-            {
-                var mockType = new Mock<Type>();
-                mockType
-                    .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
-                    .Returns(typeof(Fake)
-                        .GetMethods()
-                        .Where(m => m.Name == "PrimitiveFunctionImportComposable" || m.Name == "NotAFunctionImport")
-                        .ToArray());
+            //[Fact]
+            //public void FindFunctionImports_creates_function_imports_returning_primitive_types()
+            //{
+            //    var mockType = new Mock<Type>();
+            //    mockType
+            //        .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
+            //        .Returns(typeof(Fake)
+            //            .GetMethods()
+            //            .Where(m => m.Name == "PrimitiveFunctionImportComposable" || m.Name == "NotAFunctionImport")
+            //            .ToArray());
 
-                var functionImport = 
-                    new FunctionDiscovery(CreateModel(), mockType.Object)
-                        .FindFunctionImports().Single();
+            //    var functionImport = 
+            //        new FunctionDiscovery(CreateModel(), mockType.Object)
+            //            .FindFunctionImports().Single();
 
-                Assert.NotNull(functionImport);
-                Assert.Equal("PrimitiveFunctionImportComposable", functionImport.Name);
-                Assert.Equal(2, functionImport.Parameters.Count());
-                Assert.Equal("Edm.Int32", functionImport.ReturnType.FullName);
-                Assert.True(functionImport.IsComposable);
-            }
+            //    Assert.NotNull(functionImport);
+            //    Assert.Equal("PrimitiveFunctionImportComposable", functionImport.Name);
+            //    Assert.Equal(2, functionImport.Parameters.Count());
+            //    Assert.Equal("Edm.Int32", functionImport.ReturnType.FullName);
+            //    Assert.True(functionImport.IsComposable);
+            //}
 
-            [Fact]
-            public void FindFunctionImports_creates_function_imports_returning_complex_types()
-            {
-                var model = CreateModel();
-                model.ConceptualModel.AddItem(CreateComplexType());
+            //[Fact]
+            //public void FindFunctionImports_creates_function_imports_returning_complex_types()
+            //{
+            //    var model = CreateModel();
+            //    model.ConceptualModel.AddItem(CreateComplexType());
 
-                var mockType = new Mock<Type>();
-                mockType
-                    .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
-                    .Returns(typeof(Fake)
-                        .GetMethods()
-                        .Where(m => m.Name == "FunctionImportReturningComplexTypesComposable")
-                        .ToArray());
+            //    var mockType = new Mock<Type>();
+            //    mockType
+            //        .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
+            //        .Returns(typeof(Fake)
+            //            .GetMethods()
+            //            .Where(m => m.Name == "FunctionImportReturningComplexTypesComposable")
+            //            .ToArray());
 
-                var functionImport =
-                    new FunctionDiscovery(model, mockType.Object)
-                        .FindFunctionImports().Single();
+            //    var functionImport =
+            //        new FunctionDiscovery(model, mockType.Object)
+            //            .FindFunctionImports().Single();
 
-                Assert.NotNull(functionImport);
-                Assert.Equal("FunctionImportReturningComplexTypesComposable", functionImport.Name);
-                Assert.Equal(0, functionImport.Parameters.Count());
-                Assert.Equal("Model.TestComplexType", functionImport.ReturnType.FullName);
-                Assert.True(functionImport.IsComposable);
-            }
+            //    Assert.NotNull(functionImport);
+            //    Assert.Equal("FunctionImportReturningComplexTypesComposable", functionImport.Name);
+            //    Assert.Equal(0, functionImport.Parameters.Count());
+            //    Assert.Equal("Model.TestComplexType", functionImport.ReturnType.FullName);
+            //    Assert.True(functionImport.IsComposable);
+            //}
 
-            [Fact]
-            public void FindFunctionImports_creates_function_imports_returning_enum_types()
-            {
-                var enumTypeCtor = typeof (EnumType).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).Single(c => c.GetParameters().Count() == 5);
-                var enumType = (EnumType)enumTypeCtor.Invoke(BindingFlags.NonPublic | BindingFlags.Instance, null,
-                    new object[] {"TestEnumType", "Model", PrimitiveType.GetEdmPrimitiveType(PrimitiveTypeKind.Int32), false, DataSpace.CSpace}, 
-                    CultureInfo.InvariantCulture);
+            //[Fact]
+            //public void FindFunctionImports_creates_function_imports_returning_enum_types()
+            //{
+            //    var enumTypeCtor = typeof (EnumType).GetConstructors(BindingFlags.NonPublic | BindingFlags.Instance).Single(c => c.GetParameters().Count() == 5);
+            //    var enumType = (EnumType)enumTypeCtor.Invoke(BindingFlags.NonPublic | BindingFlags.Instance, null,
+            //        new object[] {"TestEnumType", "Model", PrimitiveType.GetEdmPrimitiveType(PrimitiveTypeKind.Int32), false, DataSpace.CSpace}, 
+            //        CultureInfo.InvariantCulture);
 
-                var model = CreateModel();
-                model.ConceptualModel.AddItem(enumType);
+            //    var model = CreateModel();
+            //    model.ConceptualModel.AddItem(enumType);
 
-                var mockType = new Mock<Type>();
-                mockType
-                    .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
-                    .Returns(typeof(Fake)
-                        .GetMethods()
-                        .Where(m => m.Name == "EnumFunctionImportComposable")
-                        .ToArray());
+            //    var mockType = new Mock<Type>();
+            //    mockType
+            //        .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
+            //        .Returns(typeof(Fake)
+            //            .GetMethods()
+            //            .Where(m => m.Name == "EnumFunctionImportComposable")
+            //            .ToArray());
 
-                var functionImport =
-                    new FunctionDiscovery(model, mockType.Object)
-                        .FindFunctionImports().Single();
+            //    var functionImport =
+            //        new FunctionDiscovery(model, mockType.Object)
+            //            .FindFunctionImports().Single();
 
-                Assert.NotNull(functionImport);
-                Assert.Equal("EnumFunctionImportComposable", functionImport.Name);
-                Assert.Equal(2, functionImport.Parameters.Count());
-                Assert.Equal("Model.TestEnumType", functionImport.ReturnType.FullName);
-                Assert.True(functionImport.IsComposable);
-            }
+            //    Assert.NotNull(functionImport);
+            //    Assert.Equal("EnumFunctionImportComposable", functionImport.Name);
+            //    Assert.Equal(2, functionImport.Parameters.Count());
+            //    Assert.Equal("Model.TestEnumType", functionImport.ReturnType.FullName);
+            //    Assert.True(functionImport.IsComposable);
+            //}
 
-            [Fact]
-            public void FindFunctionImports_creates_function_imports_returning_complex_types_non_composable()
-            {
-                var model = CreateModel();
-                model.ConceptualModel.AddItem(CreateComplexType());
+            //[Fact]
+            //public void FindFunctionImports_creates_function_imports_returning_complex_types_non_composable()
+            //{
+            //    var model = CreateModel();
+            //    model.ConceptualModel.AddItem(CreateComplexType());
 
-                var mockType = new Mock<Type>();
-                mockType
-                    .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
-                    .Returns(typeof(Fake)
-                        .GetMethods()
-                        .Where(m => m.Name == "StoredProcToComplexTypes")
-                        .ToArray());
+            //    var mockType = new Mock<Type>();
+            //    mockType
+            //        .Setup(t => t.GetMethods(It.IsAny<BindingFlags>()))
+            //        .Returns(typeof(Fake)
+            //            .GetMethods()
+            //            .Where(m => m.Name == "StoredProcToComplexTypes")
+            //            .ToArray());
 
-                var functionImport =
-                    new FunctionDiscovery(model, mockType.Object)
-                        .FindFunctionImports().Single();
+            //    var functionImport =
+            //        new FunctionDiscovery(model, mockType.Object)
+            //            .FindFunctionImports().Single();
 
-                Assert.NotNull(functionImport);
-                Assert.Equal("StoredProcToComplexTypes", functionImport.Name);
-                Assert.Equal(0, functionImport.Parameters.Count());
-                Assert.Equal("Model.TestComplexType", functionImport.ReturnType.FullName);
-                Assert.False(functionImport.IsComposable);
-            }
+            //    Assert.NotNull(functionImport);
+            //    Assert.Equal("StoredProcToComplexTypes", functionImport.Name);
+            //    Assert.Equal(0, functionImport.Parameters.Count());
+            //    Assert.Equal("Model.TestComplexType", functionImport.ReturnType.FullName);
+            //    Assert.False(functionImport.IsComposable);
+            //}
 
             [Fact]
             public void FindFunctionImports_throws_for_function_imports_with_invalid_parameters()
